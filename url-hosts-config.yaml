@@ -1,0 +1,43 @@
+aliases:
+  - &ResponseHeader
+    Access-Control-Allow-Origin: "*"
+hosts:
+ beta:
+  # beta
+  - 192.168.0.1 *.auto-test.com,auto-test.com
+ dev:
+  # dev
+  - 127.0.0.1 q.qunarzz.com,qunarzz.com,*.auto-test.com,auto-test.com
+rewriteUrls:
+  dev:
+    - matchUrl: http://auto-test.com/*/src/html/*
+      rules:
+      - http://auto-test.com/destination/productList.do* http://searchtouch.qunar.com/destination/productList.do* xxxx
+      - match: http://auto-test.com/queryData/searchCommentList.do*
+        replace: http://searchtouch.qunar.com/queryData/searchCommentList.do*
+        title: xxxx
+      - match: http://searchtouch.qunar.com/*
+        responseRules:
+          <<: *ResponseHeader
+        requestRules:
+        # on: true
+      - http://auto-test.com/stat.gif* http://searchtouch.qunar.com/stat.gif*
+      - http://auto-test.com/queryData/searchSightDetail.do* http://search.qunar.com/queryData/searchSightDetail.do*
+      # on: false
+# ${var} is not valid yaml sytax
+host:
+  dev: http://auto-test.com/intention-search-h5-hy2/src/html/
+  beta: http://auto-test.com/intention-search-h5-hy2/src/html/
+  prod: http://auto-test.com/intention-search-h5-hy2/src/html/
+baseUrl:
+  dev: ${host}index.html 
+  beta: ${host}index.html
+  prod: ${host}index.html
+baseUrlQreact:
+  dev: ${host}qreact.html 
+  beta: ${host}qreact.html
+  prod: ${host}qreact.html
+urls:
+  - 首页 ${baseUrl}#place.summary?destination=上海
+  - 首页2 ${baseUrlQreact}#place.detail?destination=上海
+isMobile: true

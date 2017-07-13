@@ -1,0 +1,36 @@
+{
+  "name": "chrome-hosts",
+  "version": "0.0.1",
+  "description": "separate hosts & url rewrite manage for chrome",
+  "main": "index.js",
+  "bin": "./index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gogoyqj/chrome-hosts.git"
+  },
+  "keywords": [
+    "hosts-manage",
+    "url-rewrite-manage",
+    "chrome"
+  ],
+  "author": "Skipper Young",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gogoyqj/chrome-hosts/issues"
+  },
+  "homepage": "https://github.com/gogoyqj/chrome-hosts#readme",
+  "dependencies": {
+    "commander": "^2.11.0",
+    "detect-port": "^1.2.1",
+    "js-yaml": "^3.9.0",
+    "koa": "^2.3.0",
+    "koa-body": "^2.3.0",
+    "koa-router": "^7.2.1",
+    "nodejs-fs-utils": "^1.0.26",
+    "ramda": "^0.24.1",
+    "superagent": "^3.5.2"
+  }
+}
