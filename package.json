@@ -30,6 +30,7 @@
     "koa-body": "^2.3.0",
     "koa-router": "^7.2.1",
     "nodejs-fs-utils": "^1.0.26",
+    "nodejs-websocket": "^1.7.1",
     "ramda": "^0.24.1",
     "superagent": "^3.5.2"
   }
