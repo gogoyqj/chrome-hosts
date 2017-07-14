@@ -114,7 +114,7 @@ module.exports = {
         data = format(data);
         let { err, json } = data;
         if (err) return Promise.reject(err);
-        let { isMobile } = json;
+        let { isMobile } = json,
             args = argsToString([{}, copyExt(data), isMobile ? mobileArgs : {}, otherArgs]),
             bin = BINS[process.platform];
         return new Promise((rs, rj) => {

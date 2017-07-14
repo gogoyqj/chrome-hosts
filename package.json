@@ -1,6 +1,6 @@
 {
   "name": "chrome-hosts",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "description": "separate hosts & url rewrite manage for chrome",
   "main": "cjs/index.js",
   "bin": "cjs/index.js",
