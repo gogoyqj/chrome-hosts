@@ -56,7 +56,7 @@ const client = (options) => {
     if (options.kill) return killRequest();
     function startSeverInBackground(err, data) {
         if (err) {
-            child_process.exec(__filename + ' server>/dev/null 2>&1 &', (err) => {
+            child_process.exec(__dirname + '/index.js server>/dev/null 2>&1 &', (err) => {
                 if (err) return console.log(err);
                 let cnt = 0,
                     timer = setInterval(() => {

@@ -3,7 +3,7 @@
  */
 const R     = require('ramda'),
     Koa     = require('koa'),
-    launcher = require('./libs/chrome-launcher'),
+    { kill, launch } = require('./libs/chrome-launcher'),
     { PORT, SOCKET } = require('./config');
 /**
  * @description start a server for launch request
@@ -36,10 +36,11 @@ const server = (options) => {
         })
         .get('/kill', (ctx) => {
             ctx.body = { err: 0, msg: 'kill server in 100ms.'};
+            kill();
             setTimeout(process.exit, 100);
         })
         .post('/launch', koaBody(), (ctx) => {
-            return launcher.launch(ctx.request.body).then((res) => {
+            return launch(ctx.request.body).then((res) => {
                 if (res && res.gid) {
                     reloadChrome(res.gid);
                 }
@@ -53,6 +54,9 @@ const server = (options) => {
     app.use(router.middleware());
     app.listen(port);
 }
+
+// kill all chrome, since process.kill won't trigger
+process.on('beforeExit', () => kill());
 
 module.exports = {
     server

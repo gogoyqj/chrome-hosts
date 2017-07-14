@@ -17,7 +17,7 @@ module.exports = {
      * @return {object} chrome args
      */
     copy: json => {
-        let { $hosts, $rewriteUrls, $urls, deploy_type, gid } = json,
+        let { $hosts, $rewriteUrls, $urls, deploy_type, gid, isMobile } = json,
             args = {};
         if ($hosts || $rewriteUrls) {
             let ExtDir = path.join(TMPDIR, gid);
@@ -29,6 +29,10 @@ module.exports = {
                 $urls.forEach(({ url, name}) => {
                     html += '<p><a target="_blank" href="' + UNICODE(url) + '">' + UNICODE(name) + '</a></p>';
                 })
+                if (html) {
+                    html = (isMobile ? '<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,minimal-ui">' : '') + 
+                    `<style>html{font-size:14px;}</style><h2>快速入口</h2>` + html;
+                }
             }
             let jsContent = `
 var urlList = window.open('about:blank');

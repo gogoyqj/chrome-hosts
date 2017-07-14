@@ -7,7 +7,7 @@ chrome-hosts 是一款便捷的 hosts + url rewrite 管理工具，通过读取�
 ### 安装
 
 ```
-    npm install chrome-hosts
+    npm install -g chrome-hosts
 ```
 
 ### 配置 url-hosts-config.yaml
@@ -19,16 +19,16 @@ aliases:
 hosts:
  beta:
   # beta
-  - 192.168.0.1 *.auto-test.com,auto-test.com
+  - 127.0.0.1:8088 *.dh.123.sogou.com,*.sogou.com
  dev:
   # dev
-  - 127.0.0.1 q.qunarzz.com,qunarzz.com,*.auto-test.com,auto-test.com
+  - 127.0.0.1 *.dh.123.sogou.com,dh.123.sogou.com,123.sogou.com,*.sogou.com
 rewriteUrls:
   dev:
-    - matchUrl: http://auto-test.com/*/src/html/*
+    - matchUrl: http://123.sogou.com/*
       rules:
-      - http://auto-test.com/destination/productList.do* http://searchtouch.qunar.com/destination/productList.do* xxxx
-      - match: http://auto-test.com/queryData/searchCommentList.do*
+      - http://123.sogou.com/destination/productList.do* http://searchtouch.qunar.com/destination/productList.do* xxxx
+      - match: http://123.sogou.com/queryData/searchCommentList.do*
         replace: http://searchtouch.qunar.com/queryData/searchCommentList.do*
         title: xxxx
       - match: http://searchtouch.qunar.com/*
@@ -36,14 +36,14 @@ rewriteUrls:
           <<: *ResponseHeader
         requestRules:
         # on: true
-      - http://auto-test.com/stat.gif* http://searchtouch.qunar.com/stat.gif*
-      - http://auto-test.com/queryData/searchSightDetail.do* http://search.qunar.com/queryData/searchSightDetail.do*
+      - http://123.sogou.com/stat.gif* http://searchtouch.qunar.com/stat.gif*
+      - http://123.sogou.com/queryData/searchSightDetail.do* http://search.qunar.com/queryData/searchSightDetail.do*
       # on: false
 # ${var} is not valid yaml sytax
 host:
-  dev: http://auto-test.com/intention-search-h5-hy2/src/html/
-  beta: http://auto-test.com/intention-search-h5-hy2/src/html/
-  prod: http://auto-test.com/intention-search-h5-hy2/src/html/
+  dev: http://123.sogou.com/
+  beta: http://123.sogou.com/
+  prod: http://123.sogou.com/
 baseUrl:
   dev: ${host}index.html 
   beta: ${host}index.html
@@ -53,10 +53,9 @@ baseUrlQreact:
   beta: ${host}qreact.html
   prod: ${host}qreact.html
 urls:
-  - 首页 ${baseUrl}#place.summary?destination=上海
-  - 首页2 ${baseUrlQreact}#place.detail?destination=上海
+  - 首页 ${baseUrl}
+  - 首页2 ${baseUrlQreact}
 isMobile: true
-
 ```
 
 ### 启动 chrome
@@ -64,6 +63,6 @@ isMobile: true
 在项目目录下调用：
 
 ```
-    # chrome-hosts -y [url-hosts-config.yaml] -d [dev|beta|prod] -u [urlToBrowse]
-    chrome-hosts -u http://123.com
+    # chrome-hosts -y [url-hosts-config.yaml] -d [dev|beta|prod]
+    chrome-hosts
 ```

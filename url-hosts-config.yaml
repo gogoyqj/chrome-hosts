@@ -7,7 +7,7 @@ hosts:
   - 127.0.0.1:8088 *.dh.123.sogou.com,*.sogou.com
  dev:
   # dev
-  - 127.0.0.1 *.dh.123.sogou.com,dh.123.sogou.com
+  - 127.0.0.1 *.dh.123.sogou.com,dh.123.sogou.com,123.sogou.com,*.sogou.com
 rewriteUrls:
   dev:
     - matchUrl: http://123.sogou.com/*
@@ -26,9 +26,9 @@ rewriteUrls:
       # on: false
 # ${var} is not valid yaml sytax
 host:
-  dev: http://123.sogou.com/intention-search-h5-hy2/src/html/
-  beta: http://123.sogou.com/intention-search-h5-hy2/src/html/
-  prod: http://123.sogou.com/intention-search-h5-hy2/src/html/
+  dev: http://123.sogou.com/
+  beta: http://123.sogou.com/
+  prod: http://123.sogou.com/
 baseUrl:
   dev: ${host}index.html 
   beta: ${host}index.html
@@ -38,6 +38,6 @@ baseUrlQreact:
   beta: ${host}qreact.html
   prod: ${host}qreact.html
 urls:
-  - 首页 ${baseUrl}#place.summary?destination=上海
-  - 首页2 ${baseUrlQreact}#place.detail?destination=上海
+  - 首页 ${baseUrl}
+  - 首页2 ${baseUrlQreact}
 isMobile: true

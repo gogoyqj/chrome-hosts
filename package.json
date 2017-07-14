@@ -1,11 +1,11 @@
 {
   "name": "chrome-hosts",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "separate hosts & url rewrite manage for chrome",
-  "main": "index.js",
-  "bin": "./index.js",
+  "main": "cjs/index.js",
+  "bin": "cjs/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "mkdir -p cjs && node_modules/.bin/babel src/libs/chrome-launcher.js -o cjs/libs/chrome-launcher.js && node_modules/.bin/babel src/libs/data-format.js -o cjs/libs/data-format.js && node_modules/.bin/babel src/libs/ext-factory.js -o cjs/libs/ext-factory.js && node_modules/.bin/babel src/client.js -o cjs/client.js && node_modules/.bin/babel src/config.js -o cjs/config.js && node_modules/.bin/babel src/index.js -o cjs/index.js && node_modules/.bin/babel src/server.js -o cjs/server.js && cp -rfp src/libs/host-switch-plus cjs/libs/host-switch-plus"
   },
   "repository": {
     "type": "git",
@@ -33,5 +33,11 @@
     "nodejs-websocket": "^1.7.1",
     "ramda": "^0.24.1",
     "superagent": "^3.5.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-latest": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1"
   }
 }

@@ -94,6 +94,21 @@ const BINS = {
 }
 const Pool = {};
 module.exports = {
+    /**
+     * @description kill a launched chrome process
+     */
+    kill: gid => {
+        let ck = _gid => { return !gid || gid === _gid };
+        for (let _gid in Pool) {
+            if (ck(_gid)) {
+                let pro = Pool[_gid];
+                pro && pro.kill && pro.kill();
+            }
+        }
+    },
+    /**
+     * @description launch a chrome process
+     */
     launch: data => {
         let json = format(data);
         let { isMobile, gid, $urls } = json;
@@ -107,7 +122,7 @@ module.exports = {
             if (bin) {
                 try {
                     let chrome = child_process.spawn(bin, args);
-                    Pool[gid] = '';
+                    Pool[gid] = chrome;
                     rs();
                     chrome.on('close', (code) => {
                         // let ExtDir = path.join(TMPDIR, gid);
