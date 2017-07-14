@@ -80,3 +80,12 @@ isMobile: true
     # -u 指定打开 url，默认读取配置内 urls 第一个值
     chrome-hosts
 ```
+
+查看 hosts 配置:
+
+```
+  # 在 url 输入框内输输入：
+  dumphosts
+```
+
+注意：查看到的 hosts 配置并不会实时更新，如需查看变更后的 hosts 需要重新操作
