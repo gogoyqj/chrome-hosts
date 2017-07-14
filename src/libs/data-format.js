@@ -1,7 +1,8 @@
 /**
  * @description format yaml to usable hosts/url rewrite rules
  */
-const jsYaml = require('js-yaml');
+const jsYaml = require('js-yaml'),
+    R = require('ramda');
 
 const formatRewriteUrls = json => {
     let { rewriteUrls, deploy_type = 'dev' } = json,
@@ -124,19 +125,31 @@ const formatHosts = (json) => {
 
 module.exports = {
     format: (data) => {
-        let { deploy_type = 'dev', yaml, gid } = data,
-            json = {}
+        let { yaml, url, deploy_type } = data,
+            json = {},
+            err;
         try {
             json = jsYaml.safeLoad(yaml);
         } catch(e) {
-            json.err = e;
+            err = e;
         }
-        if (json.err) return json;
-        json.deploy_type = deploy_type;
-        json.gid = json.gid || gid;
-        json.$rewriteUrls = formatRewriteUrls(json);
-        json.$urls = formatUrls(json);
-        json.$hosts = formatHosts(json);
-        return json;
+        if (!err) {
+            json.isMobile = 'isMobile' in data ? !!data.isMobile : !!json.isMobile;
+            deploy_type = data.deploy_type = json.deploy_type = 'deploy_type' in data ? data.deploy_type : json.deploy_type;
+            json.$rewriteUrls = formatRewriteUrls(json);
+            json.$urls = formatUrls(json);
+            json.$hosts = formatHosts(json);
+        }
+        if (String(url).indexOf('http') !== 0) json.$urls.map((item) => {
+            if (item.name === url) url = item.url;
+        });
+        let tmp = Number(url);
+        if (tmp > -1 || !url) {
+            url = (json.$urls[tmp] || json.$urls[0] || {}).url;
+        }
+        return R.mergeAll([{
+            err,
+            json
+        }, data, { url }]);
     }
 }

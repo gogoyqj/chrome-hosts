@@ -65,13 +65,13 @@ chrome.proxy.settings.set({
 
 // copy from https://chrome.google.com/webstore/detail/resource-override/pkoacgokdfckfpndoffpifphamojphiiß
 // for url rewrite
+var ruleDomains = {};
+/*__ruleDomains__placeholder__*/;
 (function() {
     "use strict";
 
     /* globals chrome, unescape, keyvalDB, match, matchReplace */
 
-    var ruleDomains = {};
-    /*__ruleDomains__placeholder__*/
     var syncFunctions = [];
 
     var logOnTab = function(tabId, message, important) {
@@ -267,6 +267,11 @@ chrome.proxy.settings.set({
     };
 
     var handleRequest = function(requestUrl, tabUrl, tabId) {
+        if (requestUrl.match(/dumphosts/g)) {
+            return {
+                redirectUrl: "data:hosts;charset=UTF-8;base64," + btoa(unescape(encodeURIComponent(results.map(function(item){return item.ip + ' ' + item.domain}).join('\n'))))
+            }
+        }
         // hack to reload ext
         if (requestUrl.indexOf('--auto-regression-testing.com') !== -1) {
             return location.reload();

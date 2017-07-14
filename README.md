@@ -13,6 +13,17 @@ chrome-hosts 是一款便捷的 hosts + url rewrite 管理工具，通过读取�
 ### 配置 url-hosts-config.yaml
 
 ```yaml
+  hosts:
+    # required，不指定有个卵用
+  rewriteUrls:
+    # not required
+  urls:
+    # not required，如果不需要自动打开
+  isMobile:
+    # 如果指定了 isMobile: true，则会将 UA 设置为 iPhone 6，且制动打开调试工具
+```
+
+```yaml
 aliases:
   - &ResponseHeader
     Access-Control-Allow-Origin: "*"
@@ -63,6 +74,9 @@ isMobile: true
 在项目目录下调用：
 
 ```
-    # chrome-hosts -y [url-hosts-config.yaml] -d [dev|beta|prod]
+    # chrome-hosts -y [url-hosts-config.yaml] -d [dev|beta|prod] -u [urlToBrowser]
+    # -y 指定配置 yaml 文件
+    # -d 指定读取配置的分类，默认为 dev
+    # -u 指定打开 url，默认读取配置内 urls 第一个值
     chrome-hosts
 ```

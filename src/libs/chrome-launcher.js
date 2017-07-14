@@ -4,11 +4,11 @@
 const R = require('ramda');
 const path = require('path');
 const fs = require('fs');
-const { copy } = require('./ext-factory');
+const { copyExt } = require('./ext-factory');
 const { format } = require('./data-format');
 const child_process = require('child_process');
 const nodejsFsUtils = require('nodejs-fs-utils');
-const { TMPDIR } = require('../config');
+const { TMPDIR, CREATED, NEW } = require('../config');
 const otherArgs = {
     '--no-default-browser-check': '',
     '--disable-translate': '',
@@ -110,20 +110,24 @@ module.exports = {
      * @description launch a chrome process
      */
     launch: data => {
-        let json = format(data);
-        let { isMobile, gid, $urls } = json;
-        let args = argsToString([{}, copy(json), isMobile ? mobileArgs : {}, otherArgs]),
+        let { gid } = data;
+        data = format(data);
+        let { err, json } = data;
+        if (err) return Promise.reject(err);
+        let { isMobile } = json;
+            args = argsToString([{}, copyExt(data), isMobile ? mobileArgs : {}, otherArgs]),
             bin = BINS[process.platform];
         return new Promise((rs, rj) => {
+            let _rs = d => rs(R.merge(d, data));
             if (gid in Pool) {
                 console.log('exist, do reload')
-                return rs({ gid });
+                return _rs({ TYPE: CREATED });
             }
             if (bin) {
                 try {
                     let chrome = child_process.spawn(bin, args);
                     Pool[gid] = chrome;
-                    rs();
+                    _rs({ TYPE: NEW });
                     chrome.on('close', (code) => {
                         // let ExtDir = path.join(TMPDIR, gid);
                         // if (fs.existsSync(ExtDir)) {

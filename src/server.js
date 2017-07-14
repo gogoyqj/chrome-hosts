@@ -4,24 +4,46 @@
 const R     = require('ramda'),
     Koa     = require('koa'),
     { kill, launch } = require('./libs/chrome-launcher'),
-    { PORT, SOCKET } = require('./config');
+    { PORT, SOCKET, CREATED, NEW, KILL } = require('./config'),
+    WS = require("nodejs-websocket");
 /**
  * @description start a server for launch request
  * @param {Object} options 
  */
 const server = (options) => {
-    const ws = require("nodejs-websocket")
-    const reloadChrome = gid => {
-        server.connections.forEach(function (connection) {
-            if (connection.gid === gid) connection.sendText(JSON.stringify({action: 'reload'}))
-        })
+    const MessagePool = {};
+    const sendMessage = (gid, data = {}) => {
+        if (gid) {
+            let sended, send = connection => connection.sendText(JSON.stringify(data));;
+            server.connections.forEach(function (connection) {
+                if (connection.gid === gid) {
+                    sended = true;
+                    send(connection);
+                }
+            });
+            if (!sended) MessagePool[gid] = send;
+        }
     }
 
     // Scream server example: "hi" -> "HI!!!"
-    const server = ws.createServer(function (connection) {
+    const server = WS.createServer(function (connection) {
         connection.gid = null;
         connection.on('text', function (str) {
-            connection.gid = str;
+            try {
+                let { gid, action } = JSON.parse(str);
+                if (action === NEW) {
+                    connection.gid = gid;
+                    let send = MessagePool[gid];
+                    if (send) {
+                        send(connection);
+                        delete MessagePool[gid];
+                    }
+                } else if (action === KILL) {
+                    kill(gid);
+                }
+            } catch(e) {
+                console.log(e)
+            }
         });
         connection.on('error', (e) => null);
     }).listen(SOCKET);
@@ -40,10 +62,12 @@ const server = (options) => {
             setTimeout(process.exit, 100);
         })
         .post('/launch', koaBody(), (ctx) => {
-            return launch(ctx.request.body).then((res) => {
-                if (res && res.gid) {
-                    reloadChrome(res.gid);
-                }
+            return launch(ctx.request.body).then((res = {}) => {
+                let { gid, TYPE, url, $urls } = res;
+                sendMessage(gid, {
+                    TYPE,
+                    url
+                })
                 ctx.body = res;
             }, (err) => {
                 ctx.body = err;

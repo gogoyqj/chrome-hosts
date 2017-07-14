@@ -7,7 +7,7 @@ hosts:
   - 127.0.0.1:8088 *.dh.123.sogou.com,*.sogou.com
  dev:
   # dev
-  - 127.0.0.1 *.dh.123.sogou.com,dh.123.sogou.com,123.sogou.com,*.sogou.com
+  - 127.0.0.1 *.dh.123.sogou.com,dh.123.sogou.com,123.sogou.com,*.sogou.com,*.hao123.com
 rewriteUrls:
   dev:
     - matchUrl: http://123.sogou.com/*
