@@ -18,19 +18,19 @@ const responder = R.curry(R.once((fn, options) => fn(options)));
 
 
 program
-    .version('0.0.1');
+    .version('0.0.6');
 
 program
     .description('launch chrome with specified hosts')
-    .option('-y,--yaml [value]', 'specify a yaml for auto regression, default is: url-hosts-config.yaml', 'url-hosts-config.yaml')
+    .option('-y,--yaml [value]', 'specify a yaml for auto launch, default is: url-hosts-config.yaml', 'url-hosts-config.yaml')
     .option('-d,--deploy_type [value]', 'specify deploy_type, can be: dev, beta or prod, determines which hosts to be used, default is: dev', 'dev')
     // .option('-m,--mode [value]', 'specify mode, if mode === browsing, just start the browser, default is: testing', 'testing')
-    .option('-u, --url [value]', 'specify a url to open if mode === browsing', false)
+    .option('-u, --url [value]', 'specify a url to open', false)
     .option('-k, --kill [value]', 'kill server in background', false);
   
 program
     .command('server')
-    .description('start a server to response launch request')
+    .description('start a server to response launch request, attention: you just need not start server manually.')
     .option("-p, --port [port]", "Which port to use", PORT)
     .action(responder(server));
 

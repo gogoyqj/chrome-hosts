@@ -1,5 +1,5 @@
 files=`ls src/libs/*.js;ls src/*.js;`
-cmd="mkdir -p cjs"
+cmd="mkdir -p cjs && mkdir -p cjs/libs"
 for f in $files;do
     cmd=$cmd" && node_modules/.bin/babel ${f} -o ${f/src/cjs}"
 done
