@@ -10,4 +10,4 @@ module.exports = {
     NEW: "NEW",
     CREATED: "CREATED",
     KILL: "KILL"
-}
+};

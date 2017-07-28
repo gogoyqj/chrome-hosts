@@ -3,16 +3,16 @@
  */
 const R = require('ramda');
 const path = require('path');
-const fs = require('fs');
+const fsAccess = require('fs-access');
+const which = require('which');
 const { copyExt } = require('./ext-factory');
 const { format } = require('./data-format');
 const child_process = require('child_process');
-const nodejsFsUtils = require('nodejs-fs-utils');
-const { TMPDIR, CREATED, NEW } = require('../config');
+const { CREATED, NEW } = require('../config');
 const otherArgs = {
     '--no-default-browser-check': '',
     '--disable-translate': '',
-    '--no-first-run': '',
+    '--no-first-run': ''//,
     // "--ignore-certificate-errors": ''
 };
 const mobileArgs = {
@@ -30,75 +30,75 @@ const argsToString = (arr) => {
             t.push(key);
         }
     }
-    return t//.join(' ')
-}
+    return t;//.join(' ')
+};
 
 // is copy from https://github.com/karma-runner/karma-chrome-launcher/blob/master/index.js
 const getChromeExe = (chromeDirName) => {
     // Only run these checks on win32
     if (process.platform !== 'win32') {
-        return null
+        return null;
     }
-    let windowsChromeDirectory, i, prefix
-    let suffix = '\\Google\\' + chromeDirName + '\\Application\\chrome.exe'
+    let windowsChromeDirectory, i, prefix;
+    let suffix = '\\Google\\' + chromeDirName + '\\Application\\chrome.exe';
     let prefixes = [process.env.LOCALAPPDATA, process.env.PROGRAMFILES, process.env['PROGRAMFILES(X86)']];
 
     for (i = 0; i < prefixes.length; i++) {
-        prefix = prefixes[i]
+        prefix = prefixes[i];
         try {
-            windowsChromeDirectory = path.join(prefix, suffix)
-            fsAccess.sync(windowsChromeDirectory)
-            return windowsChromeDirectory
+            windowsChromeDirectory = path.join(prefix, suffix);
+            fsAccess.sync(windowsChromeDirectory);
+            return windowsChromeDirectory;
         } catch (e) { }
     }
 
-    return windowsChromeDirectory
-}
+    return windowsChromeDirectory;
+};
 
 const getChromeDarwin = defaultPath => {
     if (process.platform !== 'darwin') {
-        return null
+        return null;
     }
 
     try {
-        let homePath = path.join(process.env.HOME, defaultPath)
-        fsAccess.sync(homePath)
-        return homePath
+        let homePath = path.join(process.env.HOME, defaultPath);
+        fsAccess.sync(homePath);
+        return homePath;
     } catch (e) {
-        return defaultPath
+        return defaultPath;
     }
-}
+};
 
 const getBin = commands => {
     // Don't run these checks on win32
     if (process.platform !== 'linux') {
-        return null
+        return null;
     }
-    let bin, i
+    let bin, i;
     for (i = 0; i < commands.length; i++) {
         try {
             if (which.sync(commands[i])) {
-                bin = commands[i]
-                break
+                bin = commands[i];
+                break;
             }
         } catch (e) { }
     }
-    return bin
-}
+    return bin;
+};
 
 
 const BINS = {
     linux: getBin(['google-chrome', 'google-chrome-stable']),
     darwin: getChromeDarwin('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'),
     win32: getChromeExe('Chrome')
-}
+};
 const Pool = {};
 module.exports = {
     /**
      * @description kill a launched chrome process
      */
     kill: gid => {
-        let ck = _gid => { return !gid || gid === _gid };
+        let ck = _gid => { return !gid || gid === _gid; };
         for (let _gid in Pool) {
             if (ck(_gid)) {
                 let pro = Pool[_gid];
@@ -120,7 +120,7 @@ module.exports = {
         return new Promise((rs, rj) => {
             let _rs = d => rs(R.merge(d, data));
             if (gid in Pool) {
-                console.log('exist, do reload')
+                console.log('exist, do reload');
                 return _rs({ TYPE: CREATED });
             }
             if (bin) {
@@ -128,19 +128,19 @@ module.exports = {
                     let chrome = child_process.spawn(bin, args);
                     Pool[gid] = chrome;
                     _rs({ TYPE: NEW });
-                    chrome.on('close', (code) => {
+                    chrome.on('close', () => {
                         // let ExtDir = path.join(TMPDIR, gid);
                         // if (fs.existsSync(ExtDir)) {
                         //     nodejsFsUtils.rmdirsSync(ExtDir);
                         // }
                         if (gid in Pool) delete Pool[gid];
                     });
-                } catch(e) {
+                } catch (e) {
                     rj(e);
                 }
             } else {
                 rj('runnable chrome not found.');
             }
-        })
+        });
     }
-}
+};

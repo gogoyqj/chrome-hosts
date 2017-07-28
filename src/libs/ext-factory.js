@@ -5,7 +5,7 @@ const fs = require('fs'),
     path = require('path'),
     R = require('ramda'),
     nodejsFsUtils = require('nodejs-fs-utils'),
-    { DIR, TMPDIR, CWD, HOST, PORT, SOCKET, ENCODING, NEW, CREATED, KILL } = require('../config'),
+    { TMPDIR, HOST, SOCKET, ENCODING, NEW, CREATED, KILL } = require('../config'),
     TplExtDir = path.join(__dirname, 'host-switch-plus');
 
 const UNICODE = (str) => R.replace(/[\u4e00-\u9fa5]/g, (mat) => escape(mat).replace(/%u/g, '\\u'), decodeURIComponent(str));
@@ -16,21 +16,21 @@ module.exports = {
      * @return {object} chrome args
      */
     copyExt: data => {
-        let { json = {}, deploy_type, gid } = data,
+        let { json = {}, gid } = data,
             { $hosts, $rewriteUrls, $urls, isMobile } = json,
             args = {};
         if ($hosts || $rewriteUrls) {
             let ExtDir = path.join(TMPDIR, gid);
-            nodejsFsUtils.copySync(TplExtDir, ExtDir, function(err) {
+            nodejsFsUtils.copySync(TplExtDir, ExtDir, (err) => {
                 err && console.log('ERROR: copy host-switch-plus failed with', err);
             });
             let html = '';
             if ($urls instanceof Array) {
                 $urls.forEach(({ url, name}) => {
                     html += '<p><a target="_blank" href="' + UNICODE(url) + '">' + UNICODE(name) + '</a></p>';
-                })
+                });
                 if (html) {
-                    html = (isMobile ? '<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,minimal-ui">' : '') + 
+                    html = (isMobile ? '<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,minimal-ui">' : '') +
                     `<style>html{font-size:14px;}</style><h2>快速入口</h2>` + html;
                 }
             }
@@ -106,7 +106,7 @@ chrome.tabs.onRemoved.addListener(function() {
 window.onbeforeunload = () => {
     connection.close();
 };
-            ` + 
+            ` +
                 DefaultModelJs.replace('/*__hosts__placeholder__*/', 'results = ' + JSON.stringify($hosts || []) + ';').replace('/*__ruleDomains__placeholder__*/', 'ruleDomains = ' + JSON.stringify($rewriteUrls || {}) + ';');
             fs.writeFileSync(path.join(ExtDir, 'js', 'background.js'), jsContent, ENCODING);
             args['--load-extension'] = ExtDir;
@@ -114,4 +114,4 @@ window.onbeforeunload = () => {
         }
         return args;
     }
-}
+};

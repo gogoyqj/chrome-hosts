@@ -3,7 +3,7 @@
  * @description 函数式编程 Test
  * @author Skipper Young
  */
-const R = require('ramda'), 
+const R = require('ramda'),
     program = require('commander'),
     { PORT } = require('./config');
 
@@ -43,4 +43,4 @@ module.exports = {
     server,
     client,
     launchChrome
-}
+};

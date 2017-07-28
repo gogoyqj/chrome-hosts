@@ -10,14 +10,14 @@ const formatRewriteUrls = json => {
     rewriteUrls = rewriteUrls && rewriteUrls[deploy_type] || rewriteUrls;
     if (rewriteUrls instanceof Array) {
         ruleMap = {};
-        rewriteUrls.forEach(function(item, index) {
+        rewriteUrls.forEach((item, index) => {
             if (item.on !== false) item.on = true;
             if (!item.matchUrl) item.matchUrl = '*';
             if (item.rules) {
-                item.rules = item.rules.map(function(rule) {
+                item.rules = item.rules.map((rule) => {
                     if (typeof rule === 'string') {
                         let _rule = {};
-                        rule.replace(/(^[^ ]+)[ ]+([^ ]+)(.*$)/g, function(mat, fr, to, title) {
+                        rule.replace(/(^[^ ]+)[ ]+([^ ]+)(.*$)/g, (mat, fr, to, title) => {
                             _rule.match = fr.trim();
                             _rule.replace = to.trim();
                             _rule.title = title;
@@ -27,7 +27,7 @@ const formatRewriteUrls = json => {
                     if (rule.on !== false) rule.on = true;
                     if (('requestRules' in rule) || ('responseRules' in rule)) {
                         rule.type = 'headerRule';
-                        ['requestRules', 'responseRules'].forEach(function(key) {
+                        ['requestRules', 'responseRules'].forEach((key) => {
                             let val = rule[key];
                             let str = [];
                             if (val) {
@@ -46,10 +46,10 @@ const formatRewriteUrls = json => {
                 item.on = false;
             }
             ruleMap[item.id = 'd' + index] = item;
-        })
+        });
     }
     return ruleMap;
-}
+};
 
 const formatUrls = json => {
     let { urls, deploy_type = 'dev' } = json,
@@ -63,10 +63,10 @@ const formatUrls = json => {
         if (typeof url === 'string') {
             let _url = {};
             url = format(decodeURIComponent(url), json);
-            url.replace(/(^|[ ])http[s]?:\/\/[^\[\]\(\) \r\n]+[ ]?/g, function(u) {
+            url.replace(/(^|[ ])http[s]?:\/\/[^\[\]\(\) \r\n]+[ ]?/g, (u) => {
                 _url.url = u.trim();
                 return placeHolder;
-            }).split(placeHolder).forEach(function(parts, index) {
+            }).split(placeHolder).forEach((parts, index) => {
                 if (indexToName[index]) {
                     _url[indexToName[index]] = parts.trim();
                 }
@@ -79,33 +79,33 @@ const formatUrls = json => {
         _urls.push(url);
     }
     return _urls;
-}
+};
 
 const format = (url, json) => {
     let { deploy_type } = json,
         reg = /\$\{([^\}]+)\}/g;
-    url = url.replace(reg, function(mat, val) {
+    url = url.replace(reg, (mat, val) => {
         let configValue = json[val] || '';
         configValue = deploy_type in configValue ? configValue[deploy_type] : configValue;
         return configValue;
     });
     if (url.match(reg)) return format(url, json);
     return url;
-}
+};
 
 const formatHosts = (json) => {
     let { hosts, deploy_type = 'dev' } = json,
-        _hosts = [], 
+        _hosts = [],
         cnt = 0;
     hosts = hosts[deploy_type] || hosts;
     if (hosts instanceof Array) {
-        hosts.forEach(function(host, index) {
+        hosts.forEach((host, index) => {
             host = host.trim();
             if (host.indexOf('#') === 0) return;
             host = host.split(' ');
             if (host.length < 2) return;
             let domain = host[1].split(',');
-            domain.forEach(function(item) {
+            domain.forEach((item) => {
                 _hosts.push({
                     ip: host[0],
                     domain: item.trim(),
@@ -121,7 +121,7 @@ const formatHosts = (json) => {
         });
     }
     return _hosts;
-}
+};
 
 module.exports = {
     format: (data) => {
@@ -130,7 +130,7 @@ module.exports = {
             err;
         try {
             json = jsYaml.safeLoad(yaml);
-        } catch(e) {
+        } catch (e) {
             err = e;
         }
         if (!err) {
@@ -152,4 +152,4 @@ module.exports = {
             json
         }, data, { url }]);
     }
-}
+};
