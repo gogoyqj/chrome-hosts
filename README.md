@@ -19,6 +19,8 @@ chrome-hosts 是一款便捷的 hosts + url rewrite 管理工具，通过读取�
     # not required
   urls:
     # not required，如果不需要自动打开
+  Cookie:
+    # 打开指定 url 时，自动写入的 cookie
   isMobile:
     # 如果指定了 isMobile: true，则会将 UA 设置为 iPhone 6，且制动打开调试工具
 ```
