@@ -53,7 +53,20 @@ connection.onmessage = function (event) {
     var data = event.data;
     try {
         data = JSON.parse(data);
-        var url = data.url, TYPE = data.TYPE;
+        var url = data.url, TYPE = data.TYPE, Cookie = data.Cookie;
+        if (Cookie) {
+            Cookie = Cookie.split(';')
+            Cookie.forEach(function(c) {
+                var pos = c.indexOf('=');
+                if (pos > -1) {
+                    chrome.cookies.set({
+                        url: url,
+                        name: c.substr(0, pos),
+                        value: c.substr(pos+1)
+                    })
+                }
+            })
+        }
         switch (TYPE) {
             case '${NEW}':
                 reloadTab(null, url);

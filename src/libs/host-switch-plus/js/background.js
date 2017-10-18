@@ -336,7 +336,7 @@ var ruleDomains = {};
 
     var parseHeaderDataStr = function(headerDataStr) {
         var ans = [];
-        var rules = headerDataStr.split(";");
+        var rules = headerDataStr.split("@@__@@");
         var len = rules.length;
         for (var x = 0; x < len; x++) {
             var rule = rules[x];
@@ -345,14 +345,14 @@ var ruleDomains = {};
                 if (ruleParts.length === 2) {
                     ans.push({
                         operation: "set",
-                        name: decodeURIComponent(ruleParts[0].substring(4)).toLowerCase(),
+                        name: decodeURIComponent(ruleParts[0].substring(4)),
                         value: decodeURIComponent(ruleParts[1])
                     });
                 }
             } else if (ruleParts[0].indexOf("remove") === 0) {
                 ans.push({
                     operation: "remove",
-                    name: decodeURIComponent(ruleParts[0].substring(7)).toLowerCase()
+                    name: decodeURIComponent(ruleParts[0].substring(7))
                 });
             }
         }
@@ -364,7 +364,7 @@ var ruleDomains = {};
         var len = headers.length;
         for (var x = 0; x < len; x++) {
             var header = headers[x];
-            ans[header.name.toLowerCase()] = header;
+            ans[header.name] = header;
         }
         return ans;
     };

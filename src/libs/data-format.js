@@ -35,7 +35,7 @@ const formatRewriteUrls = json => {
                                     str.push('set ' + r + ': ' + val[r]);
                                 }
                             }
-                            rule[key] = str.join(';');
+                            rule[key] = str.join('@@__@@');
                         });
                     } else {
                         rule.type = 'normalOverride';

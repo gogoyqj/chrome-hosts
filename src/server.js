@@ -62,8 +62,9 @@ const server = (options) => {
         })
         .post('/launch', koaBody(), (ctx) => {
             return launch(ctx.request.body).then((res = {}) => {
-                let { gid, TYPE, url } = res;
+                let { gid, TYPE, url, json: { Cookie } } = res;
                 sendMessage(gid, {
+                    Cookie,
                     TYPE,
                     url
                 });

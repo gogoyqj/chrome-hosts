@@ -19,6 +19,7 @@
   },
   "permissions": [
     "proxy",
+    "cookies",
     "tabs",
     "webRequest",
     "webRequestBlocking",
