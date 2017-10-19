@@ -9,7 +9,9 @@ const formatRewriteUrls = json => {
         ruleMap;
     rewriteUrls = rewriteUrls && rewriteUrls[deploy_type] || rewriteUrls;
     if (rewriteUrls instanceof Array) {
-        ruleMap = {};
+        ruleMap = {
+            '@@__@@': []
+        };
         rewriteUrls.forEach((item, index) => {
             if (item.on !== false) item.on = true;
             if (!item.matchUrl) item.matchUrl = '*';
@@ -33,6 +35,14 @@ const formatRewriteUrls = json => {
                             if (val) {
                                 for (let r in val) {
                                     str.push('set ' + r + ': ' + val[r]);
+                                    if (r === 'Cookie' && val[r][0] === '@') {
+                                        if (val[r] === '@') {
+                                            throw Error('Cookie: "@" is not Supported');
+                                        }
+                                        if (ruleMap['@@__@@'].indexOf(val[r]) === -1) {
+                                            ruleMap['@@__@@'].push(val[r]);
+                                        }
+                                    }
                                 }
                             }
                             rule[key] = str.join('@@__@@');
@@ -130,22 +140,20 @@ module.exports = {
             err;
         try {
             json = jsYaml.safeLoad(yaml);
-        } catch (e) {
-            err = e;
-        }
-        if (!err) {
             json.isMobile = 'isMobile' in data ? !!data.isMobile : !!json.isMobile;
             deploy_type = data.deploy_type = json.deploy_type = 'deploy_type' in data ? data.deploy_type : json.deploy_type;
             json.$rewriteUrls = formatRewriteUrls(json);
             json.$urls = formatUrls(json);
             json.$hosts = formatHosts(json);
-        }
-        if (String(url).indexOf('http') !== 0) json.$urls.map((item) => {
-            if (item.name === url) url = item.url;
-        });
-        let tmp = Number(url);
-        if (tmp > -1 || !url) {
-            url = (json.$urls[tmp] || json.$urls[0] || {}).url;
+            if (String(url).indexOf('http') !== 0) json.$urls.map((item) => {
+                if (item.name === url) url = item.url;
+            });
+            let tmp = Number(url);
+            if (tmp > -1 || !url) {
+                url = (json.$urls[tmp] || json.$urls[0] || {}).url;
+            }
+        } catch (e) {
+            err = e;
         }
         return R.mergeAll([{
             err,

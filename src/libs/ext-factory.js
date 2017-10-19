@@ -35,9 +35,33 @@ module.exports = {
                 }
             }
             let DefaultModelJs = fs.readFileSync(path.join(TplExtDir, 'js', 'background.js'), ENCODING);
+            let copyDomain = $rewriteUrls['@@__@@'];
+            delete $rewriteUrls['@@__@@'];
+            let str = JSON.stringify($rewriteUrls || {});
             let jsContent = `
-//var urlList = window.open('about:blank');
-//if(${!!html}) urlList.document.write('${html}');
+${
+    DefaultModelJs
+        .replace('/*__hosts__placeholder__*/', 'results = ' + JSON.stringify($hosts || []) + ';')
+        .replace('/*__ruleDomains__placeholder__*/', 'ruleDomains = ' + str + ';')
+}
+;window.$CookieMapping = {};
+window.$LoadCookie = function(domain) {
+    return new Promise(function(rs, rj) {
+        var timer = setTimeout(function() {
+            var message = 'get cookie from ' + domain + ' time out';
+            console.warn(message);
+            rj(message);
+        }, 5000);
+        chrome.cookies.getAll({ domain: domain.replace(/^@/g, '')}, function(cookies) {
+            $CookieMapping[domain] = cookies.map(function(c) {
+                return c.name + '=' + c.value;
+            }).join(';');
+            rs($CookieMapping[domain]);
+            clearTimeout(timer);
+        });
+    });
+};
+${JSON.stringify(copyDomain)}.map($LoadCookie);
 connection = new WebSocket("ws://${HOST}:${SOCKET}");
 connection.onopen = function () {
     console.log("Connection opened");
@@ -57,13 +81,26 @@ connection.onmessage = function (event) {
         if (Cookie) {
             Cookie = Cookie.split(';')
             Cookie.forEach(function(c) {
-                var pos = c.indexOf('=');
-                if (pos > -1) {
-                    chrome.cookies.set({
-                        url: url,
-                        name: c.substr(0, pos),
-                        value: c.substr(pos+1)
-                    })
+                if (c[0] === '@') {
+                    chrome.cookies.getAll({ domain: c.substr(1)}, function(cookies) {
+                        cookies.map(function(c) {
+                            chrome.cookies.set({
+                                url: url,
+                                name: c.name,
+                                expirationDate: c.expirationDate,
+                                value: c.value
+                            }) 
+                        });
+                    });
+                } else {
+                    var pos = c.indexOf('=');
+                    if (pos > -1) {
+                        chrome.cookies.set({
+                            url: url,
+                            name: c.substr(0, pos),
+                            value: c.substr(pos+1)
+                        })
+                    }
                 }
             })
         }
@@ -119,8 +156,7 @@ chrome.tabs.onRemoved.addListener(function() {
 window.onbeforeunload = () => {
     connection.close();
 };
-            ` +
-                DefaultModelJs.replace('/*__hosts__placeholder__*/', 'results = ' + JSON.stringify($hosts || []) + ';').replace('/*__ruleDomains__placeholder__*/', 'ruleDomains = ' + JSON.stringify($rewriteUrls || {}) + ';');
+            `;
             fs.writeFileSync(path.join(ExtDir, 'js', 'background.js'), jsContent, ENCODING);
             args['--load-extension'] = ExtDir;
             args['--user-data-dir'] = ExtDir;

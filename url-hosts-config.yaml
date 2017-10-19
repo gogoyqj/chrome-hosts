@@ -1,6 +1,13 @@
 aliases:
   - &ResponseHeader
     Access-Control-Allow-Origin: "*"
+  - &requestRules:
+    Cookie: "@123.sogou.com" # Cookie 的获取为异步，所以赞不支持 @
+    Host: "@" # 取当前请求的 hostname
+    Origin: "@" # 取当前请求 url
+    Referer: "@" # 取当前请求 url
+Cookie:
+    "@123.sogou.com" # 取 123.sogou.com 域下 Cookie 复制到当前打开的 url 下，注意：不能保证完全同步
 hosts:
  beta:
   # beta

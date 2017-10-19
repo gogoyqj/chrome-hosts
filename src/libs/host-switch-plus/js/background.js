@@ -132,102 +132,6 @@ var ruleDomains = {};
         };
     })();
 
-    // var simpleError = function(err) {
-    //     if (err.stack) {
-    //         console.error("=== Printing Stack ===");
-    //         console.error(err.stack);
-    //     }
-    //     console.error(err);
-    // };
-
-    // var domainStorage = (function() {
-    //     var db = keyvalDB("OverrideDB", [{store: "domains", key: "id"}], 1);
-    //     var domainStore = db.usingStore("domains");
-
-    //     var put = function(domainData) {
-    //         return new Promise(function(res, rej) {
-    //             db.open(function(err) {
-    //                 if (err) {
-    //                     console.error(err);
-    //                     rej(err);
-    //                 } else {
-    //                     domainStore.upsert(domainData.id, domainData, function(err) {
-    //                         if (err) {
-    //                             console.error(err);
-    //                             rej(err);
-    //                         } else {
-    //                             res();
-    //                         }
-    //                     });
-    //                 }
-    //             });
-    //         });
-    //     };
-
-    //     var getDomains = function() {
-    //         return new Promise(function(res, rej) {
-    //             db.open(function(err) {
-    //                 if (err) {
-    //                     console.error(err);
-    //                     rej(err);
-    //                 } else {
-    //                     domainStore.getAll(function(err, ans) {
-    //                         if (err) {
-    //                             console.error(err);
-    //                             rej(err);
-    //                         } else {
-    //                             res(ans);
-    //                         }
-    //                     });
-    //                 }
-    //             });
-    //         });
-    //     };
-
-    //     var deleteDomain = function(id) {
-    //         return new Promise(function(res, rej) {
-    //             db.open(function(err) {
-    //                 if (err) {
-    //                     console.error(err);
-    //                     rej(err);
-    //                 } else {
-    //                     domainStore.delete(id, function(err) {
-    //                         if (err) {
-    //                             console.error(err);
-    //                             rej(err);
-    //                         } else {
-    //                             res();
-    //                         }
-    //                     });
-    //                 }
-    //             });
-    //         });
-    //     };
-
-    //     return {
-    //         put: put,
-    //         getAll: getDomains,
-    //         delete: deleteDomain
-    //     };
-    // })();
-
-    // var syncAllInstances = function() {
-    //     // Doing this weird dance because I cant figure out how to
-    //     // send data from this script to the dev tools script.
-    //     // Nothing seems to work (even the examples!).
-    //     syncFunctions.forEach(function(fn) {
-    //         try {
-    //             fn();
-    //         } catch(e) {}
-    //     });
-    //     syncFunctions = [];
-    // };
-
-    // This function will try to guess the mime type.
-    // The goal is to use the highest ranking mime type that it gets from these sources (highest
-    // ranking sources first): The user provided mime type on the first line of the file, the url
-    // file extension, the file looks like html, the file looks like xml, the file looks like,
-    // JavaScript, the file looks like CSS, can't tell what the file is so default to text/plain.
     var extractMimeType = function(requestUrl, file) {
         file = file || "";
         var possibleExt = (requestUrl.match(/\.[A-Za-z]{2,4}$/) || [""])[0];
@@ -334,7 +238,7 @@ var ruleDomains = {};
         };
     };
 
-    var parseHeaderDataStr = function(headerDataStr) {
+    var parseHeaderDataStr = function(headerDataStr, requestUrl) {
         var ans = [];
         var rules = headerDataStr.split("@@__@@");
         var len = rules.length;
@@ -343,10 +247,22 @@ var ruleDomains = {};
             var ruleParts = rule.split(": ");
             if (ruleParts[0].indexOf("set") === 0) {
                 if (ruleParts.length === 2) {
+                    var val = decodeURIComponent(ruleParts[1]);
+                    var name = decodeURIComponent(ruleParts[0].substring(4));
+                    if (val[0] === '@') {
+                        const hostname = requestUrl.split(/\/\//g)[1].split(/[\/\?#]+/g)[0];
+                        if (name === 'Cookie') {
+                            val = $CookieMapping[val] || $CookieMapping['@' + hostname] || val;
+                        } else if (name === 'Host') {
+                            val = hostname;// get hostname
+                        } else {
+                            val = requestUrl;
+                        }
+                    }
                     ans.push({
                         operation: "set",
-                        name: decodeURIComponent(ruleParts[0].substring(4)),
-                        value: decodeURIComponent(ruleParts[1])
+                        name: name,
+                        value: val,
                     });
                 }
             } else if (ruleParts[0].indexOf("remove") === 0) {
@@ -375,7 +291,8 @@ var ruleDomains = {};
         headerObjToReturn[headerObjToReturnKey] = headers;
         for (var key in ruleDomains) {
             var domainObj = ruleDomains[key];
-            if (domainObj.on && match(domainObj.matchUrl, tabUrl).matched) {
+            var excludeUrl = domainObj.excludeUrl && match(domainObj.excludeUrl, tabUrl).matched; // 排除
+            if (domainObj.on && match(domainObj.matchUrl, tabUrl).matched && !excludeUrl) {
                 var rules = domainObj.rules || [];
                 for (var x = 0, len = rules.length; x < len; ++x) {
                     var ruleObj = rules[x];
@@ -384,8 +301,8 @@ var ruleDomains = {};
                             var rulesStr = ruleObj[type + "Rules"];
                             logOnTab(tabId, "Header Rule Matched: " + requestUrl +
                                 " applying rules: " + rulesStr, true);
-                            var headerRules = parseHeaderDataStr(rulesStr);
-                            var headersObj = makeHeadersObject(headers);
+                            var headerRules = parseHeaderDataStr(rulesStr, requestUrl);
+                            var headersObj = makeHeadersObject(headers, requestUrl);
                             var numRules = headerRules.length;
                             for (var t = 0; t < numRules; t++) {
                                 var rule = headerRules[t];
@@ -418,35 +335,7 @@ var ruleDomains = {};
     };
 
     chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-        /*if (request.action === "saveDomain") {
-            domainStorage.put(request.data)
-                .then(syncAllInstances)
-                .catch(simpleError);
-            ruleDomains[request.data.id] = request.data;
-        } else if (request.action === "getDomains") {
-            domainStorage.getAll().then(function(domains) {
-                sendResponse(domains || []);
-            }).catch(simpleError);
-        } else if (request.action === "deleteDomain") {
-            domainStorage.delete(request.id)
-                .then(syncAllInstances)
-                .catch(simpleError);
-            delete ruleDomains[request.id];
-        } else if (request.action === "import") {
-            var maxId = 0;
-            for (var id in ruleDomains) {
-                maxId = Math.max(maxId, parseInt(id.substring(1)));
-            }
-            maxId++;
-            Promise.all(request.data.map(function(domainData) {
-                // dont overwrite any pre-existing domains.
-                domainData.id = "d" + maxId++;
-                ruleDomains[domainData.id] = domainData;
-                return domainStorage.put(domainData);
-            }))
-            .then(syncAllInstances)
-            .catch(simpleError);
-        } else */if (request.action === "makeGetRequest") {
+        if (request.action === "makeGetRequest") {
             var xhr = new XMLHttpRequest();
             xhr.open("GET", request.url, true);
             xhr.onreadystatechange = function() {

@@ -70,7 +70,10 @@ const server = (options) => {
                 });
                 ctx.body = res;
             }, (err) => {
-                ctx.body = err;
+                console.warn(err.message);
+                ctx.body = {
+                    err: err.message
+                };
             });
         }).get('*', (ctx) => {
             ctx.body = { err: "POST ONLY" };

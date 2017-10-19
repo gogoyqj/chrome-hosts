@@ -23,7 +23,7 @@ const requester = R.curry((method, path, fn, data) => {
         .end(fn);
 });
 const checkStatus = R.curry((fn, err, data) => {
-    fn(err || data.err, data && data.body);
+    fn(err || data && data.body && data.body.err ||  data.err, data && data.body);
 });
 const checkRequest = fn => requester('get', 'check', checkStatus(fn), {});
 const killRequest = () => requester('get', 'kill', NOOP, {});

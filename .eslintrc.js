@@ -16,7 +16,8 @@ module.exports = {
 	},
 	globals: {
 		sinon: true,
-		expect: true
+		expect: true,
+		chrome: true,
 	},
 	rules: {
 		'no-unused-vars': [1, { varsIgnorePattern: '^h$' }],

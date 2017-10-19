@@ -1,52 +1,4 @@
 {
-  "_args": [
-    [
-      {
-        "raw": "chrome-hosts",
-        "scope": null,
-        "escapedName": "chrome-hosts",
-        "name": "chrome-hosts",
-        "rawSpec": "",
-        "spec": "latest",
-        "type": "tag"
-      },
-      "/Users/tmp"
-    ]
-  ],
-  "_cnpm_publish_time": 1505469904713,
-  "_from": "chrome-hosts@latest",
-  "_hasShrinkwrap": false,
-  "_id": "chrome-hosts@0.0.8",
-  "_inCache": true,
-  "_location": "/chrome-hosts",
-  "_nodeVersion": "6.11.1",
-  "_npmOperationalInternal": {
-    "host": "s3://npm-registry-packages",
-    "tmp": "tmp/chrome-hosts-0.0.8.tgz_1505469904640_0.42657049000263214"
-  },
-  "_npmUser": {
-    "name": "yangqianjun",
-    "email": "ivugogo@gmail.com"
-  },
-  "_npmVersion": "3.10.10",
-  "_phantomChildren": {},
-  "_requested": {
-    "raw": "chrome-hosts",
-    "scope": null,
-    "escapedName": "chrome-hosts",
-    "name": "chrome-hosts",
-    "rawSpec": "",
-    "spec": "latest",
-    "type": "tag"
-  },
-  "_requiredBy": [
-    "#USER"
-  ],
-  "_resolved": "https://registry.npm.taobao.org/chrome-hosts/download/chrome-hosts-0.0.8.tgz",
-  "_shasum": "b7090712cdf417e4143864e4773a7a6fcd1d87a3",
-  "_shrinkwrap": null,
-  "_spec": "chrome-hosts",
-  "_where": "/Users/tmp",
   "author": {
     "name": "Skipper Young"
   },
@@ -80,14 +32,6 @@
     "babel-preset-stage-0": "^6.24.1",
     "eslint": "^4.3.0"
   },
-  "directories": {},
-  "dist": {
-    "shasum": "b7090712cdf417e4143864e4773a7a6fcd1d87a3",
-    "size": 43680,
-    "noattachment": false,
-    "tarball": "http://registry.npm.taobao.org/chrome-hosts/download/chrome-hosts-0.0.8.tgz"
-  },
-  "gitHead": "21b501effd58807060a09929e3f7361bf27e16bc",
   "homepage": "https://github.com/gogoyqj/chrome-hosts#readme",
   "keywords": [
     "hosts-manage",
@@ -104,8 +48,6 @@
   ],
   "name": "chrome-hosts",
   "optionalDependencies": {},
-  "publish_time": 1505469904713,
-  "readme": "ERROR: No README data found!",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gogoyqj/chrome-hosts.git"
@@ -113,5 +55,5 @@
   "scripts": {
     "build": "mkdir -p cjs && mkdir -p cjs/libs && node_modules/.bin/babel src/libs/chrome-launcher.js -o cjs/libs/chrome-launcher.js && node_modules/.bin/babel src/libs/data-format.js -o cjs/libs/data-format.js && node_modules/.bin/babel src/libs/ext-factory.js -o cjs/libs/ext-factory.js && node_modules/.bin/babel src/client.js -o cjs/client.js && node_modules/.bin/babel src/config.js -o cjs/config.js && node_modules/.bin/babel src/index.js -o cjs/index.js && node_modules/.bin/babel src/server.js -o cjs/server.js && mkdir -p cjs/libs/host-switch-plus && cp -rfp src/libs/host-switch-plus/* cjs/libs/host-switch-plus/"
   },
-  "version": "0.0.8"
+  "version": "0.0.9"
 }

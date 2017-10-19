@@ -6,7 +6,7 @@
             }
         }], "stage-0"
     ],
-    "plugins": [["transform-runtime", {
+    "plugins": [["transform-runtime", "syntax-async-generators", {
         "helpers": true,
         "polyfill": true,
         "regenerator": true,

@@ -24,19 +24,38 @@ chrome-hosts 是一款便捷的 hosts + url rewrite 管理工具，通过读取�
   Cookie:
     # 自动设置 cookie 到 打开的 url
     xxx=xxx;xxx=xxx
+    # 或通过 @ 语法， 取 123.sogou.com 域下 Cookie 复制到当前打开的 url 下，注意：不能保证完全同步
+    @123.sogou.com
+  rewriteUrls:
+  dev:
+    - matchUrl: http://123.sogou.com/*
+      rules:
+        - match: http://searchtouch.qunar.com/*
+          requestRules:
+            Cookie: "@123.sogou.com" # Cookie 的获取为异步，所以赞不支持 @
+            Host: "@" # 取当前请求的 hostname
+            Origin: "@" # 取当前请求 url
+            Referer: "@" # 取当前请求 url
 ```
 
 ```yaml
 aliases:
   - &ResponseHeader
     Access-Control-Allow-Origin: "*"
+  - &requestRules:
+    Cookie: "@123.sogou.com" # Cookie 的获取为异步，所以赞不支持 @
+    Host: "@" # 取当前请求的 hostname
+    Origin: "@" # 取当前请求 url
+    Referer: "@" # 取当前请求 url
+Cookie:
+    "@123.sogou.com" # 取 123.sogou.com 域下 Cookie 复制到当前打开的 url 下，注意：不能保证完全同步
 hosts:
  beta:
   # beta
   - 127.0.0.1:8088 *.dh.123.sogou.com,*.sogou.com
  dev:
   # dev
-  - 127.0.0.1 *.dh.123.sogou.com,dh.123.sogou.com,123.sogou.com,*.sogou.com
+  - 127.0.0.1 *.dh.123.sogou.com,dh.123.sogou.com,123.sogou.com,*.sogou.com,*.hao123.com
 rewriteUrls:
   dev:
     - matchUrl: http://123.sogou.com/*
