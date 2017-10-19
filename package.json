@@ -55,5 +55,5 @@
   "scripts": {
     "build": "mkdir -p cjs && mkdir -p cjs/libs && node_modules/.bin/babel src/libs/chrome-launcher.js -o cjs/libs/chrome-launcher.js && node_modules/.bin/babel src/libs/data-format.js -o cjs/libs/data-format.js && node_modules/.bin/babel src/libs/ext-factory.js -o cjs/libs/ext-factory.js && node_modules/.bin/babel src/client.js -o cjs/client.js && node_modules/.bin/babel src/config.js -o cjs/config.js && node_modules/.bin/babel src/index.js -o cjs/index.js && node_modules/.bin/babel src/server.js -o cjs/server.js && mkdir -p cjs/libs/host-switch-plus && cp -rfp src/libs/host-switch-plus/* cjs/libs/host-switch-plus/"
   },
-  "version": "0.0.10"
+  "version": "0.0.11"
 }
