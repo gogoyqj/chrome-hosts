@@ -28,7 +28,8 @@ chrome-hosts 是一款便捷的 hosts + url rewrite 管理工具，通过读取�
     @123.sogou.com
   rewriteUrls:
   dev:
-    - matchUrl: http://123.sogou.com/*
+    - matchUrl: "*"
+      excludeUrl: http://123.sogou.com/* # 匹配除此之外的 url
       rules:
         - match: http://searchtouch.qunar.com/*
           requestRules:
