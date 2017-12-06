@@ -18,7 +18,7 @@ const responder = R.curry(R.once((fn, options) => fn(options)));
 
 
 program
-    .version('0.0.11');
+    .version(require('../package.json').version);
 
 program
     .description('launch chrome with specified hosts')
