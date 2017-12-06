@@ -97,8 +97,8 @@ connection.onmessage = function (event) {
                     if (pos > -1) {
                         chrome.cookies.set({
                             url: url,
-                            name: c.substr(0, pos),
-                            value: c.substr(pos+1)
+                            name: c.substr(0, pos).trim(),
+                            value: c.substr(pos+1).trim()
                         })
                     }
                 }
@@ -159,7 +159,7 @@ window.onbeforeunload = () => {
             `;
             fs.writeFileSync(path.join(ExtDir, 'js', 'background.js'), jsContent, ENCODING);
             args['--load-extension'] = ExtDir;
-            args['--user-data-dir'] = ExtDir;
+            args['--user-data-dir'] = `${ExtDir}_data`;
         }
         return args;
     }

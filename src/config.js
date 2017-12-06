@@ -1,6 +1,6 @@
 module.exports = {
     DIR: __dirname,
-    TMPDIR: process.env.TMPDIR,
+    TMPDIR: process.env.HOME,
     SOCKET: 8001,
     PORT: 8002,
     HOST: '127.0.0.1',
