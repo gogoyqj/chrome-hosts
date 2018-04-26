@@ -403,6 +403,20 @@ var ruleDomains = {};
         };
     })();
 
+    var requestHeadersHandle = makeHeaderHandler("request");
+    chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
+        var res = requestHeadersHandle(details);
+        return res;
+    }, {
+        urls: ["<all_urls>"]
+    }, ["blocking", "requestHeaders"]);
+
+    var commonHeaders = [
+        {
+            name: 'User-Agent',
+            value: navigator.userAgent
+        }
+    ];
     chrome.webRequest.onBeforeRequest.addListener(function(details) {
         if (!requestIdTracker.has(details.requestId)) {
             if (details.tabId > -1) {
@@ -417,21 +431,45 @@ var ruleDomains = {};
                         // make sure we don't try to redirect again.
                         requestIdTracker.push(details.requestId);
                     }
+                    // post 走代理
+                    if (details.method === 'POST' && result && result.redirectUrl) {
+                        var fakeDetails = Object.assign(details);
+                        var url = fakeDetails.url = result.redirectUrl;
+                        fakeDetails.requestHeaders = fakeDetails.requestHeaders || [].concat(commonHeaders);
+                        var res = requestHeadersHandle(fakeDetails);
+                        var requestHeaders = res.requestHeaders;
+                        ['Host', 'Origin', 'Referer']
+                            .forEach(function(name, index) {
+                                if (!requestHeaders.find(function(item) {
+                                    return item.name === name;
+                                })) {
+                                    requestHeaders.push({
+                                        name: name,
+                                        value: index ? url : ((url.split('//')[1] || '').match(/[^/?#]+/g) || [url])[0]
+                                    })
+                                }
+                            });
+                        return {
+                            redirectUrl: 'http://127.0.0.1:' + node_proxy_port + 
+                                '/proxy?url=' + encodeURIComponent(url) +
+                                '&headers=' + encodeURIComponent(JSON.stringify(requestHeaders))
+                        }
+                    }
                     return result;
                 }
             }
         }
     }, {
         urls: ["<all_urls>"]
-    }, ["blocking"]);
-
-    chrome.webRequest.onHeadersReceived.addListener(makeHeaderHandler("response"), {
+    }, ["blocking", "requestBody"]);
+    
+    var responseHeadersHandle = makeHeaderHandler("response");
+    chrome.webRequest.onHeadersReceived.addListener(function(details) {
+        var res = responseHeadersHandle(details);
+        return res;
+    }, {
         urls: ["<all_urls>"]
     }, ["blocking", "responseHeaders"]);
-
-    chrome.webRequest.onBeforeSendHeaders.addListener(makeHeaderHandler("request"), {
-        urls: ["<all_urls>"]
-    }, ["blocking", "requestHeaders"]);
 
     //init settings
     if (localStorage.devTools === undefined) {

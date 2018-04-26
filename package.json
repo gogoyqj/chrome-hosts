@@ -9,19 +9,21 @@
     "url": "https://github.com/gogoyqj/chrome-hosts/issues"
   },
   "dependencies": {
-    "babel-runtime": "^6.23.0",
-    "commander": "^2.11.0",
-    "detect-port": "^1.2.1",
+    "@koa/cors": "^2.2.1",
+    "axios": "^0.18.0",
+    "babel-runtime": "^6.26.0",
+    "commander": "^2.15.1",
+    "detect-port": "^1.2.2",
     "fs-access": "^1.0.1",
-    "js-yaml": "^3.9.0",
-    "koa": "^2.3.0",
-    "koa-body": "^2.3.0",
-    "koa-router": "^7.2.1",
-    "nodejs-fs-utils": "^1.0.26",
+    "js-yaml": "^3.11.0",
+    "koa": "^2.5.0",
+    "koa-body": "^2.5.0",
+    "koa-router": "^7.4.0",
+    "nodejs-fs-utils": "^1.1.0",
     "nodejs-websocket": "^1.7.1",
-    "ramda": "^0.24.1",
-    "superagent": "^3.5.2",
-    "which": "^1.2.14"
+    "ramda": "^0.25.0",
+    "superagent": "^3.8.2",
+    "which": "^1.3.0"
   },
   "description": "separate hosts & url rewrite manage for chrome",
   "devDependencies": {
@@ -55,5 +57,5 @@
   "scripts": {
     "build": "mkdir -p cjs && mkdir -p cjs/libs && node_modules/.bin/babel src/libs/chrome-launcher.js -o cjs/libs/chrome-launcher.js && node_modules/.bin/babel src/libs/data-format.js -o cjs/libs/data-format.js && node_modules/.bin/babel src/libs/ext-factory.js -o cjs/libs/ext-factory.js && node_modules/.bin/babel src/client.js -o cjs/client.js && node_modules/.bin/babel src/config.js -o cjs/config.js && node_modules/.bin/babel src/index.js -o cjs/index.js && node_modules/.bin/babel src/server.js -o cjs/server.js && mkdir -p cjs/libs/host-switch-plus && cp -rfp src/libs/host-switch-plus/* cjs/libs/host-switch-plus/"
   },
-  "version": "0.0.12"
+  "version": "0.0.13"
 }

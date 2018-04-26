@@ -6,7 +6,8 @@ const fs = require('fs'),
     R = require('ramda'),
     nodejsFsUtils = require('nodejs-fs-utils'),
     { TMPDIR, HOST, SOCKET, ENCODING, NEW, CREATED, KILL } = require('../config'),
-    TplExtDir = path.join(__dirname, 'host-switch-plus');
+    TplExtDir = path.join(__dirname, 'host-switch-plus'),
+    config = require('../config');
 
 const UNICODE = (str) => R.replace(/[\u4e00-\u9fa5]/g, (mat) => escape(mat).replace(/%u/g, '\\u'), decodeURIComponent(str));
 
@@ -42,7 +43,7 @@ module.exports = {
 ${
     DefaultModelJs
         .replace('/*__hosts__placeholder__*/', 'results = ' + JSON.stringify($hosts || []) + ';')
-        .replace('/*__ruleDomains__placeholder__*/', 'ruleDomains = ' + str + ';')
+        .replace('/*__ruleDomains__placeholder__*/', 'ruleDomains = ' + str + ';var node_proxy_port=' + config.PORT)
 }
 ;window.$CookieMapping = {};
 window.$LoadCookie = function(domain) {

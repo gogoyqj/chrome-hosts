@@ -4,7 +4,9 @@
 const Koa     = require('koa'),
     { kill, launch } = require('./libs/chrome-launcher'),
     { PORT, SOCKET, NEW, KILL } = require('./config'),
-    WS = require("nodejs-websocket");
+    WS = require('nodejs-websocket'),
+    axios = require('axios'),
+    cors = require('@koa/cors');;
 /**
  * @description start a server for launch request
  * @param {Object} options 
@@ -51,6 +53,8 @@ const server = (options) => {
         router = require('koa-router')(),
         koaBody = require('koa-body'),
         port = options.port || PORT;
+
+    app.use(cors());
     router
         .get('/check', (ctx) => {
             ctx.body = { err: 0 };
@@ -75,7 +79,32 @@ const server = (options) => {
                     err: err.message
                 };
             });
-        }).get('*', (ctx) => {
+        })
+        .post('/proxy', koaBody(), (ctx) => {
+            const { body, query } = ctx.request;
+            let { url, headers } = query;
+            try {
+                const headersArr = JSON.parse(headers);
+                headers = {};
+                headersArr
+                    .forEach(({ name, value }) => {
+                        headers[name] = value;
+                    });
+            } catch (e) {
+                headers = {};
+            }
+            return axios
+                .post(url, body, { headers })
+                .then((res) => {
+                    ctx.body = res.data;
+                }, (err) => {
+                    ctx.body = {
+                        code: err.response.status,
+                        message: err.response.statusText
+                    };
+                });
+        })
+        .get('*', (ctx) => {
             ctx.body = { err: "POST ONLY" };
         });
     app.use(router.middleware());
