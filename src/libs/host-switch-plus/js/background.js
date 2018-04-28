@@ -194,7 +194,10 @@ var ruleDomains = {};
                                 logOnTab(tabId, "URL Override Matched: " + requestUrl +
                                     "   to:   " + newUrl + "   match url: " + ruleObj.match, true);
                                 if (requestUrl !== newUrl) {
-                                    return {redirectUrl: newUrl};
+                                    return {
+                                        proxy: ruleObj.proxy,
+                                        redirectUrl: newUrl
+                                    };
                                 } else {
                                     // allow redirections to the original url (aka do nothing).
                                     // This allows for "redirect all of these except this."
@@ -432,7 +435,7 @@ var ruleDomains = {};
                         requestIdTracker.push(details.requestId);
                     }
                     // post 走代理
-                    if (details.method === 'POST' && result && result.redirectUrl) {
+                    if (details.method === 'POST' && result && result.redirectUrl && result.proxy) {
                         var fakeDetails = Object.assign(details);
                         var url = fakeDetails.url = result.redirectUrl;
                         fakeDetails.requestHeaders = fakeDetails.requestHeaders || [].concat(commonHeaders);
@@ -454,6 +457,9 @@ var ruleDomains = {};
                                 '/proxy?url=' + encodeURIComponent(url) +
                                 '&headers=' + encodeURIComponent(JSON.stringify(requestHeaders))
                         }
+                    }
+                    if (result) {
+                        delete result.proxy;
                     }
                     return result;
                 }

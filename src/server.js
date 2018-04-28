@@ -6,7 +6,8 @@ const Koa     = require('koa'),
     { PORT, SOCKET, NEW, KILL } = require('./config'),
     WS = require('nodejs-websocket'),
     axios = require('axios'),
-    cors = require('@koa/cors');;
+    cors = require('@koa/cors'),
+    qs = require('qs');
 /**
  * @description start a server for launch request
  * @param {Object} options 
@@ -81,20 +82,24 @@ const server = (options) => {
             });
         })
         .post('/proxy', koaBody(), (ctx) => {
-            const { body, query } = ctx.request;
+            const { body, query, type } = ctx.request;
             let { url, headers } = query;
             try {
                 const headersArr = JSON.parse(headers);
-                headers = {};
+                headers = {
+                    ...ctx.request.header
+                };
                 headersArr
                     .forEach(({ name, value }) => {
-                        headers[name] = value;
+                        headers[name.toLowerCase()] = value;
                     });
             } catch (e) {
-                headers = {};
+                headers = {
+                    ...ctx.request.header
+                };
             }
             return axios
-                .post(url, body, { headers })
+                .post(url, type.match(/x-www-form-urlencoded/g) ? qs.stringify(body) : body, { headers })
                 .then((res) => {
                     ctx.body = res.data;
                 }, (err) => {

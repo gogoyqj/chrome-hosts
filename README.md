@@ -61,9 +61,11 @@ rewriteUrls:
   dev:
     - matchUrl: http://123.sogou.com/*
       rules:
+      # 直接转发
       - http://123.sogou.com/destination/productList.do* http://searchtouch.qunar.com/destination/productList.do* xxxx
       - match: http://123.sogou.com/queryData/searchCommentList.do*
         replace: http://searchtouch.qunar.com/queryData/searchCommentList.do*
+        proxy: true # 通过 nodejs 代理转发
         title: xxxx
       - match: http://searchtouch.qunar.com/*
         responseRules:
